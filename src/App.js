@@ -1,35 +1,38 @@
-import React, { Component } from 'react';
-import Navbar from './components/layout/Navbar';
-import Users from './components/users/Users';
-import axios from 'axios';
-import './App.css';
-// asdasdsad
-export default class App extends Component {
-  state = {
-    users: [],
-    loading: false
-  }
+import React from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import Navbar from "./components/layout/Navbar";
+import Alert from "./components/layout/Alert";
+import About from "./components/pages/About";
+import User from "./components/users/User";
+import NotFound from "./components/pages/NotFound";
+import Home from "./components/pages/Home";
+import GithubState from "./context/github/GithubState";
+import AlertState from "./context/alert/AlertState";
+import "./App.css";
 
-  async componentDidMount() {
-    console.log(process.env.REACT_APP_GITHUB_CLIENT_SECRET)
-    this.setState({ loading: true });
+const App = () => {
+  return (
+    <GithubState>
+      <AlertState>
+        <Router>
+          <div className='App'>
+            <Navbar />
+            <div className='container'>
+              <Alert />
+              <Switch>
+                <Route exact path='/' component={Home} />
+                <Route exact path='/about'>
+                  {About}
+                </Route>
+                <Route exact path='/user/:login' component={User}></Route>
+                <Route component={NotFound}></Route>
+              </Switch>
+            </div>
+          </div>
+        </Router>
+      </AlertState>
+    </GithubState>
+  );
+};
 
-    const res = await axios.get(`https://api.github.com/users?client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`);
-
-    this.setState({ users: res.data, loading: false })
-  }
-
-  render() {
-    return (
-      <div className='App'>
-        <Navbar />
-        <div className="container">
-          <Users loading={this.state.loading} users={this.state.users} />
-        </div>
-
-      </div>
-    )
-  }
-
-}
-
+export default App;
